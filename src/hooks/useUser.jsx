@@ -1,5 +1,7 @@
 import { useState, createContext, useContext } from "react";
 import { getSingleDoc } from "../firebase/apiFunctions";
+import { useEffect } from "react";
+import { getToken } from "../components/lib";
 
 const UserContext = createContext();
 
@@ -11,6 +13,12 @@ export const UserProvider = ({ children }) => {
     console.log(data, "user data");
   };
 
+  useEffect(() => {
+    const uid = getToken();
+    if (uid) {
+      getUser(uid);
+    }
+  }, []);
   return (
     <UserContext.Provider value={{ user, setUser, getUser }}>
       {children}

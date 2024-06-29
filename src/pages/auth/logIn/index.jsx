@@ -4,10 +4,13 @@ import { logInSchema } from "../../../components/schemas";
 import useLoader from "../../../hooks/useLoader";
 import { logInUser } from "../../../firebase/apiFunctions";
 import useUser from "../../../hooks/useUser";
+import { useNavigate } from "react-router-dom";
+import { getToken, setToken } from "../../../components/lib";
 
 const LogIn = () => {
   const { setIsLoading, Loader } = useLoader();
   const { getUser } = useUser();
+  const navigate = useNavigate();
 
   const initialValues = {
     email: "",
@@ -16,9 +19,14 @@ const LogIn = () => {
 
   const handleSubmit = async (values) => {
     setIsLoading(true);
-    await logInUser(values);
-    const uid = JSON.parse(localStorage.getItem("uid"));
-    await getUser(uid);
+    const user = await logInUser(values);
+    console.log(user, "user");
+    if (user) {
+      setToken(user.user.uid);
+      const uid = getToken();
+      await getUser(uid);
+      navigate("/home");
+    }
     setIsLoading(false);
   };
 
